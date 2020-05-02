@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: carwash-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: carwash
+  template:
+    metadata:
+      labels:
+        app: carwash
+    spec:
+      containers:
+        - name: carwash-container
+          image: asseridos/carwashservice
+          imagePullPolicy: Always
+          env:                        
+          - name: MYSQL_ROOT_PASSWORD 
+            value: password
+          - name: URL_DATABASE
+            value: mysql
+          - name: SPRING_PROFILES_ACTIVE
+            value: kube
+          - name: URL_REGISTRY
+            value: registry-service
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: carwash-service
+spec:
+  ports:
+    - name: http
+      targetPort: 8082
+      port: 8082
+  type: ClusterIP
+  selector:
+    app: carwash

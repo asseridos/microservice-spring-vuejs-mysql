@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend-container
+          image: asseridos/vuejsapp
+          imagePullPolicy: Always
+          env:                        
+          - name: RENT_API 
+            value: carrental-service.default.svc.local:8081
+          - name: WASH_API
+            value: carwash-service.default.svc.local:8082
+          - name: NODE_ENV
+            value: production
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+spec:
+  ports:
+    - name: http
+      targetPort: 8080
+      port: 8080
+  type: ClusterIP
+  selector:
+    app: frontend

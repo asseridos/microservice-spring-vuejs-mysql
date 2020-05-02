@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: carrental-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: carrental
+  template:
+    metadata:
+      labels:
+        app: carrental
+    spec:
+      containers:
+        - name: carrental-container
+          image: asseridos/carrentalservice
+          imagePullPolicy: Always
+          env:                        
+          - name: MYSQL_ROOT_PASSWORD 
+            value: password
+          - name: URL_DATABASE
+            value: mysql
+          - name: SPRING_PROFILES_ACTIVE
+            value: kube
+          - name: URL_REGISTRY
+            value: registry-service.default.svc.local:8761
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: carrental-service
+spec:
+  ports:
+    - name: http
+      targetPort: 8081
+      port: 8081
+  type: ClusterIP
+  selector:
+    app: carrental
